@@ -53,7 +53,7 @@
 #endif
 
 #ifndef TAP_TO_WAKE_NODE
-#define TAP_TO_WAKE_NODE "/proc/nvt_wake_gesture"
+#define TAP_TO_WAKE_NODE "/proc/tp_gesture"
 #endif
 
 #ifndef TAP_TO_WAKE_NODE2
