@@ -17,7 +17,8 @@
 
 set -e
 
-DEVICE_COMMON=sdm660-common
+# Required!
+DEVICE=lavender
 VENDOR=xiaomi
 
 INITIAL_COPYRIGHT_YEAR=2018
