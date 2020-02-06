@@ -96,6 +96,9 @@ case "$baseband" in
         start vendor.ril-daemon
     fi
 
+    # start vendor.ipacm-diag
+    start vendor.ipacm
+
     case "$baseband" in
         "svlte2a" | "csfb")
           start qmiproxy
@@ -130,12 +133,10 @@ case "$baseband" in
     case "$datamode" in
         "tethered")
             start vendor.dataqti
-            start vendor.port-bridge
             start vendor.dataadpl
             ;;
         "concurrent")
             start vendor.dataqti
-            start vendor.port-bridge
             start vendor.dataadpl
             ;;
         *)
