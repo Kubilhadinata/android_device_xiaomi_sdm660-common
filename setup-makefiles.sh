@@ -17,7 +17,6 @@
 
 set -e
 
-# Required!
 DEVICE=lavender
 VENDOR=xiaomi
 
@@ -36,11 +35,11 @@ if [ ! -f "$HELPER" ]; then
 fi
 . "$HELPER"
 
-# Initialize the common helper
-setup_vendor "$DEVICE_COMMON" "$VENDOR" "$BLISS_ROOT" true
+# Initialize the helper
+setup_vendor "$DEVICE" "$VENDOR" "$BLISS_ROOT"
 
 # Copyright headers and guards
-write_headers "twolip jasmine_sprout wayne clover lavender platina"
+write_headers "lavender"
 
 write_makefiles "$MY_DIR"/proprietary-files.txt true
 
@@ -48,9 +47,24 @@ write_makefiles "$MY_DIR"/proprietary-files.txt true
 write_footers
 
 if [ -s "$MY_DIR"/../$DEVICE/proprietary-files.txt ]; then
+    # Reinitialize the helper for device specified common
+    INITIAL_COPYRIGHT_YEAR="$DEVICE_BRINGUP_YEAR"
+    setup_vendor "$DEVICE" "$VENDOR" "$DU_ROOT" true
+
+    # Copyright headers and guards
+    write_headers "$DEVICE"
+
+    # The standard device specified common blobs
+    write_makefiles "$MY_DIR"/../$DEVICE/proprietary-files.txt true
+
+    # We are done!
+    write_footers
+fi
+
+if [ -s "$MY_DIR"/../$DEVICE/proprietary-files.txt ]; then
     # Reinitialize the helper for device
     INITIAL_COPYRIGHT_YEAR="$DEVICE_BRINGUP_YEAR"
-    setup_vendor "$DEVICE" "$VENDOR" "$BLISS_ROOT" false
+    setup_vendor "$DEVICE" "$VENDOR" "$DU_ROOT" false
 
     # Copyright headers and guards
     write_headers

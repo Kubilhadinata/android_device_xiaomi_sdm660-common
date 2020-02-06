@@ -17,7 +17,7 @@
 
 set -e
 
-DEVICE_COMMON=sdm660-common
+DEVICE=lavender
 VENDOR=xiaomi
 
 # Load extract_utils and do some sanity checks
@@ -34,18 +34,10 @@ fi
 . "$HELPER"
 
 # Default to sanitizing the vendor folder before extraction
-clean_vendor=true
-ONLY_COMMON=
-ONLY_DEVICE=
+CLEAN_VENDOR=true
 
 while [ "${#}" -gt 0 ]; do
     case "${1}" in
-        -o | --only-common )
-                ONLY_COMMON=false
-                ;;
-        -d | --only-device )
-                ONLY_DEVICE=false
-                ;;
         -n | --no-cleanup )
             CLEAN_VENDOR=false
             ;;
@@ -54,7 +46,6 @@ while [ "${#}" -gt 0 ]; do
                 ;;
         -s | --section )
                 SECTION="${2}"; shift
-                clean_vendor=false
                 CLEAN_VENDOR=false
                 ;;
         * )
@@ -81,28 +72,25 @@ function blob_fixup() {
         ;;
 
     vendor/lib/hw/camera.sdm660.so)
-        patchelf --add-needed camera.sdm660_shim.so "${2}"
+        patchelf --replace-needed libMiWatermark.so libMiWatermark_shim.so "${2}"
         ;;
-
-    vendor/lib/hw/sound_trigger.primary.sdm660.so | vendor/lib64/hw/sound_trigger.primary.sdm660.so)
-        patchelf --add-needed libprocessgroup.so "${2}"
-        ;;
-
-    product/etc/permissions/vendor.qti.hardware.data.connection-V1.{0,1}-java.xml)
-        sed -i 's/xml version="2.0"/xml version="1.0"/' "${2}"
-
     esac
 }
 
 # Initialize the common helper
 setup_vendor "$DEVICE_COMMON" "$VENDOR" "$BLISS_ROOT" true $clean_vendor
 
-if [ -z "${ONLY_DEVICE}" ] && [ -s "${MY_DIR}/proprietary-files.txt" ]; then
 extract "$MY_DIR"/proprietary-files.txt "$SRC" \
+    "${KANG}" --section "${SECTION}"
+
+if [ -s "$MY_DIR"/../$DEVICE_SPECIFIED_COMMON/proprietary-files.txt ];then
+    # Reinitialize the helper for device specified common
+    setup_vendor "$DEVICE_SPECIFIED_COMMON" "$VENDOR" "$DU_ROOT" false "$CLEAN_VENDOR"
+    extract "$MY_DIR"/../$DEVICE_SPECIFIED_COMMON/proprietary-files.txt "$SRC" \
     "${KANG}" --section "${SECTION}"
 fi
 
-if [ -z "${ONLY_COMMON}" ] && [ -s "${MY_DIR}/../${DEVICE}/proprietary-files.txt" ]; then
+if [ -s "$MY_DIR"/../$DEVICE/proprietary-files.txt ]; then
     # Reinitialize the helper for device
     setup_vendor "$DEVICE" "$VENDOR" "$BLISS_ROOT" false "$CLEAN_VENDOR"
     extract "$MY_DIR"/../$DEVICE/proprietary-files.txt "$SRC" \
