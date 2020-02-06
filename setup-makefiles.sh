@@ -17,7 +17,7 @@
 
 set -e
 
-DEVICE=lavender
+DEVICE_COMMON=sdm660-common
 VENDOR=xiaomi
 
 INITIAL_COPYRIGHT_YEAR=2018
@@ -35,8 +35,8 @@ if [ ! -f "$HELPER" ]; then
 fi
 . "$HELPER"
 
-# Initialize the helper
-setup_vendor "$DEVICE" "$VENDOR" "$BLISS_ROOT"
+# Initialize the common helper
+setup_vendor "$DEVICE_COMMON" "$VENDOR" "$DU_ROOT" true
 
 # Copyright headers and guards
 write_headers "lavender"
@@ -46,16 +46,16 @@ write_makefiles "$MY_DIR"/proprietary-files.txt true
 # Finish
 write_footers
 
-if [ -s "$MY_DIR"/../$DEVICE/proprietary-files.txt ]; then
+if [ -s "$MY_DIR"/../$DEVICE_SPECIFIED_COMMON/proprietary-files.txt ]; then
     # Reinitialize the helper for device specified common
     INITIAL_COPYRIGHT_YEAR="$DEVICE_BRINGUP_YEAR"
-    setup_vendor "$DEVICE" "$VENDOR" "$DU_ROOT" true
+    setup_vendor "$DEVICE_SPECIFIED_COMMON" "$VENDOR" "$DU_ROOT" true
 
     # Copyright headers and guards
-    write_headers "$DEVICE"
+    write_headers "$DEVICE_SPECIFIED_COMMON_DEVICE"
 
     # The standard device specified common blobs
-    write_makefiles "$MY_DIR"/../$DEVICE/proprietary-files.txt true
+    write_makefiles "$MY_DIR"/../$DEVICE_SPECIFIED_COMMON/proprietary-files.txt true
 
     # We are done!
     write_footers

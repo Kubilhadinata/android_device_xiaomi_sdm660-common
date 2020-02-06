@@ -16,8 +16,7 @@
 
 LOCAL_PATH := $(call my-dir)
 
-ifeq ($(TARGET_DEVICE),lavender)
-include $(call all-makefiles-under,$(LOCAL_PATH))
+ifneq ($(filter lavender,$(TARGET_DEVICE)),)
 
 $(shell mkdir -p $(TARGET_OUT_VENDOR)/firmware)
 
